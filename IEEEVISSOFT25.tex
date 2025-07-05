@@ -83,7 +83,7 @@ The data we used came from the Zenodo dataset provided by VISSOFT. This data was
 At first, almost all nodes took on a nearly indistinguishable shade of green, except for a select few nodes. This was because the range of commits made to subsystems was huge. The maximum number of commits made to a subsystem was 500,000 while the minimum was 0. The average was somewhere around 1000 commits per subsystem. Thus, when we colored each node by taking a ratio between each subsystems number of commits by the maximum number of commits it heavily skewed the nodes to be green. To fix this we implemented a logarithmic scale. The color of each node is now determined by the log of that previous ratio, except in cases where the ratio becomes $0$ or $1$. Those cases are handled individually, since $\log(0)$ is undefined and $\log(1)$ returns a green color which is the opposite of what is desired when the ratio is $1$. This logarithmic scaling fixed the issue with most nodes looking identical. Nodes now take on a range of colors from green to red.
 
 \subsection{Graph Construction}
-To construct the graph we created C\# code in Unity to read the text file output from Java. The text file contained the parent-child relationships between all of the subsystems, the exact number of commits made to each subsystem, and a color corresponding to each node. Our code created a set of nodes and a set of vertices based on this text file. A node is created to represent each subsystem and its corresponding color, and an edge connects two nodes if and only if one is a child of the other. This creates a hierarchical graph layout that not only shows us the relationships between the subsystems, but also the relative commit frequency between them as well. This graph is then visualized using a radial layout so that the nodes are spaced evenly along different radii.
+We utilized C\# in Unity to visualize the graph. First, we read the text file output from Java. The text file contained the parent-child relationships between all of the subsystems, the exact number of commits made to each subsystem, and a color corresponding to each node. Our code created a set of nodes and a set of vertices based on this text file. A node is created to represent each subsystem and its corresponding color, and an edge connects two nodes if and only if one is a child of the other. This creates a hierarchical graph layout that not only shows us the relationships between the subsystems, but also the relative commit frequency between them as well. This graph is then visualized using a radial layout so that the nodes are spaced evenly along different radii.
 
 \subsection{Implementation}
 The implementation of this graph in Unity is interactive. The user is able to zoom in/out and pan the camera. The user is also able to click on each node to view information about that subsystem. On click, the user can see the name of the subsystem and the exact number of commits made to that subsystem. 
@@ -94,13 +94,11 @@ The implementation of this graph in Unity is interactive. The user is able to zo
 	\caption{This image shows a variety of colors attributed to nodes based on commit frequency of that subsystem.}
 \end{figure}
 
-\section{Results}
+\section{Results and Discussion}
 
-talk about scalability issues, groups of high commit frequency, and think of other things to talk about as well.
+- talk about scalability issues, groups of high commit frequency, and think of other things to talk about as well.
 
-\section{Discussion}
-
-talk about future directions except you plan on doing some of those future directions so i don teven know what man. talk about using git clone instead of java text file reading output roundabout stupid way.
+- talk about future directions except you plan on doing some of those future directions so i don teven know what man. talk about using git clone instead of java text file reading output roundabout stupid way.
 
 \section{Conclusion}
 
