@@ -90,7 +90,7 @@ Few visualization tools emphasize commit activity as a primary data source. For 
 
 This section outlines the design and implementation of our visualization tool, from data collection to graph construction and user interaction.
 
-\subsection{Data Collection}
+\subsection{Data Collection} 
 The dataset used was obtained from Zenodo, provided by Bermejo et al. \cite{zenodo}. It consists of Linux kernel commit and bug data. The data was given to us in the form of a JavaScript Object Notation (JSON) file. We developed a Java script to parse through the data and output an intermediate text file. The text file held information on the relationships between the subsystems, the number of commits on each subsystem, and a color corresponding with each subsystem determined by its number of commits. This text file is what we use to construct and render the graph.
 
 \subsection{Color Encoding}
