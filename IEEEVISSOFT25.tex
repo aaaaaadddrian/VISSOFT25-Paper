@@ -66,9 +66,9 @@ Analyzing commit history is useful for developers because it can show areas in t
 
 % before I forget, add paragraph summarizing (quikcly) the results part and the future works part.
 
-As we will see in section \ref{resAndDisc} this tool illuminates patterns in how the Linux kernel is being changed. Furthermore, in section \ref{futDir} we will talk about issues we faced with scalability in our tool and ideas for fixing them.
+As we will see in Section \ref{resAndDisc} this tool illuminates patterns in how the Linux kernel is being changed. Furthermore, in Section \ref{futDir} we will talk about issues we faced with scalability in our tool and ideas for fixing them. This tool is available with all of its dependencies in our replication package\footnote{www.url.com}.
 
-The paper will proceed as such: in section \ref{relWork} we explain works that inspired this tool as well as similarities and differences in adjacent works. Section \ref{method} presents the architecture and design of our tool. In section \ref{resAndDisc}, we will expound on patterns shown through our tool, and why these are useful to developers. Finally, in section \ref{futDir} we will conclude with the current limitations of this tool and ideas for future work.
+The paper will proceed as such: in Section \ref{relWork} we explain works that inspired this tool as well as similarities and differences in adjacent works. Section \ref{method} presents the architecture and design of our tool. In Section \ref{resAndDisc}, we will expound on patterns shown through our tool, and why these are useful to developers. Finally, in Section \ref{futDir} we will conclude with the current limitations of this tool and ideas for future work.
 
 
 
@@ -91,7 +91,7 @@ Few visualization tools emphasize commit activity as a primary data source. For 
 This section outlines the design and implementation of our visualization tool, from data collection to graph construction and user interaction.
 
 \subsection{Data Collection} 
-The dataset used was obtained from Zenodo, provided by Bermejo et al. \cite{zenodo}. It consists of Linux kernel commit and bug data. The data was given to us in the form of a JavaScript Object Notation (JSON) file. We developed a Java script to parse through the data and output an intermediate text file. The text file held information on the relationships between the subsystems, the number of commits on each subsystem, and a color corresponding with each subsystem determined by its number of commits. This text file is what we use to construct and render the graph.
+The dataset used was obtained from Zenodo, provided by Bermejo et al. \cite{zenodo}. It consists of Linux kernel commit and bug data from 2023, however we only used the commit data for this tool. The data was given to us in the form of a JavaScript Object Notation (JSON) file. We developed a Java script to parse through the data and output an intermediate text file. The text file held information on the relationships between the subsystems, the number of commits on each subsystem, and a color corresponding with each subsystem determined by its number of commits. This text file is what we use to construct and render the graph.
 
 \subsection{Color Encoding}
 \label{colE}
@@ -112,13 +112,13 @@ To address this, we implemented a logarithmic transformation to the ratio. This 
 \label{graphC}
 The graph was constructed and rendered using Unity through C\# scripting. Unity was chosen because of its support for real-time user interfaces, and efficient handling of large-scale 2D elements.
 
-Upon startup, the tool reads the preproccessed text file output by the Java parser. This file encodes three pieces of information: (i) the heirarchical parent-child relationships between subsystems, (ii) the total number of commits made to each subsystem, and (iii) the color value computed from the log-scaled heat-map encoding system described in subsection \ref{colE}.
+Upon startup, the tool reads the preproccessed text file output by the Java parser. This file encodes three pieces of information: (i) the heirarchical parent-child relationships between subsystems, (ii) the total number of commits made to each subsystem, and (iii) the color value computed from the log-scaled heat-map encoding system described in Subsection \ref{colE}.
 
 In Unity, each subsystem is represented as a Node GameObject. Each Node stores the subsystems name, commit amount, associated color, and list of child nodes. Then Edge GameObjects were drawn between Nodes corresponding to each of their child nodes list.
 
 To construct the graph visually, we used a recursive algorithm to iterate through the hierarchy starting from the root node. At each radius from the center, nodes are distributed evenly along an arc around their parent node. This layout helps user's movement along the graph more than a tradition tree layout - such as a binary tree. 
 
-This visualization method was helpful for user movement around the graph, however node crowding becomes an issue in deeper levels. This will be discussed in further detail in section \ref{futDir}.
+This visualization method was helpful for user movement around the graph, however node crowding becomes an issue in deeper levels. This will be discussed in further detail in Section \ref{futDir}.
 
 \begin{figure}[h!]
 	\centering
@@ -133,7 +133,7 @@ Our visualization implementation is interactive. In particular, the user is able
 
 To support data inspection, each node is clickable. Clicking on a node reveals the subsystem’s name and its commit count, providing detailed context on demand. An example of the node information panel is shown in Figure \ref{inner}.
 
-This interactive functionality was implemented using Unity's UI Event System and Canvas System, which allows for real-time responses as mentioned in subsection \ref{graphC}. Nodes were assigned listeners, while camera controls were mapped to the usual bindings. These features allow for in-depth exploration of the Linux subsystem structure.
+This interactive functionality was implemented using Unity's UI Event System and Canvas System, which allows for real-time responses as mentioned in Subsection \ref{graphC}. Nodes were assigned listeners, while camera controls were mapped to the usual bindings. These features allow for in-depth exploration of the Linux subsystem structure.
 
 
 
@@ -142,7 +142,7 @@ This interactive functionality was implemented using Unity's UI Event System and
 \section{Results and Discussion}
 \label{resAndDisc}
 
-- talk about scalability issues, groups of high commit frequency, and think of other things to talk about as well
+
 
 \begin{figure}[h!]
 	\centering
