@@ -68,7 +68,7 @@ Analyzing commit history is useful for developers because it can show areas in t
 
 As we will see in section \ref{resAndDisc} this tool illuminates patterns in how the Linux kernel is being changed. Furthermore, in section \ref{futDir} we will talk about issues we faced with scalability in our tool and ideas for fixing them.
 
-The paper will as such: in section \ref{relWork} we explain works that inspired this tool as well as similarities and differences in adjacent works. Section \ref{method} presents the architecture and design of our tool. In section \ref{resAndDisc}, we will expound on patterns shown through our tool, and why these are useful to developers. Finally, in section \ref{futDir} we will conclude with the current limitations of this tool and ideas for future work.
+The paper will proceed as such: in section \ref{relWork} we explain works that inspired this tool as well as similarities and differences in adjacent works. Section \ref{method} presents the architecture and design of our tool. In section \ref{resAndDisc}, we will expound on patterns shown through our tool, and why these are useful to developers. Finally, in section \ref{futDir} we will conclude with the current limitations of this tool and ideas for future work.
 
 
 
@@ -76,9 +76,14 @@ The paper will as such: in section \ref{relWork} we explain works that inspired 
 \section{Related Work}
 \label{relWork}
 
-% read papers, summarize each one individually, then look at every summary and answer these questions in the paper: what is known? what is unknown? what has been done? what are you doing? how are they different? or do it this way : GENERAL OVERVIEW WHAT BEEN DONE, go through each paper and explain, GENERAL OVERVIEW WHA+Y DIFFERENT.
 
-There have been many papers on Linux software visualization techniques \cite{jayara}, \cite{cityVR}, \cite{visLin}. However, most methods of visualization involve looking at the code rather than commits. An interesting software visualization method is the code city visualization. The method used in \cite{visLin} turns software artifacts into buildings inside of a city. This allows users to see both the package structure of the system and the kinds of software artifacts inside of the system. This approach is different from our own in a few ways. First, it is a 3D visualization while ours is 2D \cite{visLin}. Another visualization technique used is a Linux package dependency visualization tool shown in \cite{mithun}. The tool shown in \cite{mithun} is quite similar to our own in the fact that it is a 2D graph representation that shows hierarchical relationships. Though, their tool shows these relationships for packages in the Linux kernel while ours shows relationships between subsystems. 
+Software visualization has been widely used as a tool to better understand the Linux kernel, with most work focusing on static code structure rather than commit data. A well-known method is the 'code city' metaphor, which represents software artifacts, like classes and files, as buildings grouped into districts that reflect the systems package structure \cite{cityVR}, \cite{city}. In \cite{cityVR} the authors use a virtual reality simulation that allows users to walk through the 'code city.' This is similar to our tool's ability to allow users to traverse the graph, however we are in 2D. 
+
+Another visualization technique used is a Linux package dependency visualization tool shown in \cite{mithun}. The tool shown in \cite{mithun} is quite similar to our own in the fact that it is a 2D graph representation that shows hierarchical relationships.
+
+Other tools, such as the Linux package dependency visualizer in \cite{mithun}, also use 2D graph-based layouts to show hierarchical relationships. However, their work focuses on packages while ours visualizes relationships between kernel subsystems. 
+
+Few visualization tools emphasize commit activity as a primary data source. For instance, \cite{merge} explores how commits are merged to the master branch of the Linux kernel, but does not visualize structural hierarchy or aggregate commit frequency. Our approach integrates structural and temporal information into a single layout.
 
 \section{Methodology}
 \label{method}
@@ -89,7 +94,12 @@ This section outlines the design and implementation of our visualization tool, f
 The dataset used was obtained from Zenodo, provided by Bermejo et al. \cite{zenodo}. It consists of Linux kernel commit and bug data. The data was given to us in the form of a JavaScript Object Notation (JSON) file. We developed a Java script to parse through the data and output an intermediate text file. The text file held information on the relationships between the subsystems, the number of commits on each subsystem, and a color corresponding with each subsystem determined by its number of commits. This text file is what we use to construct and render the graph.
 
 \subsection{Color Encoding}
-Initially, node colors were determined by a ratio between each subsystems number of commits to the maximum observed number of commits. However, due to a large range in commit data - from 0 to over 500,000 - most nodes appeared as indistinguishable shades of green. The average was somewhere around 1000 commits per subsystem. Except for a select few nodes, the graphs color was monochromatic. To address this, we implemented a logarithmic transformation to the ratio. This compressed the dynamic range of the nodes. Special cases had to be handled explicitly: $\log(0)$ is undefined and $\log(1)$ returned an unintended blue color - signifying $0$ commits made on the maximally committed node. This logarithmic scaling fixed the issue with most nodes looking identical. Nodes now take on a range of colors from blue (fewer commits) to red (more commits). This heat-map approach is useful because it makes it immediately obvious to the user which nodes (or subsystems) have been modified the most. This can be seen in Figure \ref{in}.
+\label{colE}
+Initially, node colors were determined by a ratio between each subsystems number of commits to the maximum observed number of commits. However, due to a large range in commit data - from 0 to over 500,000 - most nodes appeared as indistinguishable shades of green. The average was somewhere around 1000 commits per subsystem. Except for a select few nodes, the graphs color was monochromatic.
+
+To address this, we implemented a logarithmic transformation to the ratio. This compressed the dynamic range of the nodes. Special cases had to be handled explicitly: $\log(0)$ is undefined and $\log(1)$ returned an unintended blue color - signifying $0$ commits made on the maximally committed node. This logarithmic scaling fixed the issue with most nodes looking identical. Nodes now take on a range of colors from blue (fewer commits) to red (more commits).
+
+ This heat-map approach is useful because it makes it immediately obvious to the user which nodes (or subsystems) have been modified the most. An example of variety in node color can be seen in Figure \ref{in}.
 
 \begin{figure}[h!]
 	\centering
@@ -99,12 +109,16 @@ Initially, node colors were determined by a ratio between each subsystems number
 \end{figure}
 
 \subsection{Graph Construction}
-We utilized C\# in Unity to visualize the graph. The text file contained the parent-child relationships between all of the subsystems, the exact number of commits made to each subsystem, and a color corresponding to each node. Our code created a set of nodes and a set of vertices based on this text file. Each subsystem is represented using a node and, edges are created to reflect parent-child relationships. This creates a hierarchical graph layout that not only shows us the relationships between the subsystems, but also the relative commit frequency between them as well. Nodes are positioned using a radial layout to help with spacing and user traversal.
+\label{graphC}
+The graph was constructed and rendered using Unity through C\# scripting. Unity was chosen because of its support for real-time user interfaces, and efficient handling of large-scale 2D elements.
 
+Upon startup, the tool reads the preproccessed text file output by the Java parser. This file encodes three pieces of information: (i) the heirarchical parent-child relationships between subsystems, (ii) the total number of commits made to each subsystem, and (iii) the color value computed from the log-scaled heat-map encoding system described in subsection \ref{colE}.
 
+In Unity, each subsystem is represented as a Node GameObject. Each Node stores the subsystems name, commit amount, associated color, and list of child nodes. Then Edge GameObjects were drawn between Nodes corresponding to each of their child nodes list.
 
-\subsection{UI/UX}
-Our visualization implementation is interactive. In particular, the user is able to zoom in/out and pan the camera. Clicking on a node reveals the subsystem’s name and its commit count, providing detailed context on demand. An example of the node information panel is shown in Figure \ref{inner}.
+To construct the graph visually, we used a recursive algorithm to iterate through the hierarchy starting from the root node. At each radius from the center, nodes are distributed evenly along an arc around their parent node. This layout helps user's movement along the graph more than a tradition tree layout - such as a binary tree. 
+
+This visualization method was helpful for user movement around the graph, however node crowding becomes an issue in deeper levels. This will be discussed in further detail in section \ref{futDir}.
 
 \begin{figure}[h!]
 	\centering
@@ -112,6 +126,16 @@ Our visualization implementation is interactive. In particular, the user is able
 	\caption{View of the tool showing the info panel that appears on click.}
 	\label{inner}
 \end{figure}
+
+
+\subsection{UI/UX}
+Our visualization implementation is interactive. In particular, the user is able to zoom in/out camera allowing examination of broad system structure and individual nodes. The camera can also be panned freely, supporting exploration across the different regions of the graph. These navigational features are necessary considering the size and density of the data. 
+
+To support data inspection, each node is clickable. Clicking on a node reveals the subsystem’s name and its commit count, providing detailed context on demand. An example of the node information panel is shown in Figure \ref{inner}.
+
+This interactive functionality was implemented using Unity's UI Event System and Canvas System, which allows for real-time responses as mentioned in subsection \ref{graphC}. Nodes were assigned listeners, while camera controls were mapped to the usual bindings. These features allow for in-depth exploration of the Linux subsystem structure.
+
+
 
 
 
@@ -134,7 +158,13 @@ The current state of the tool fulfills it's original purpose of visualizing Linu
 
 The tool does not keep track of some important data regarding the commits such as the time the commit was made or the author of the commit. These would a great first step in improving the tool. Furthermore, the tool is currently working on a dataset from 2023. A future improvement would be cloning the Linux GitHub repository for commit data rather than relying on the Zenodo dataset \cite{zenodo} we have been using.
 
-Another implementation that would help developers using this tool would be filters to remove redundant or unnecessary information. The ability to sort by what dates the desired commits were made on, by author or by which subsystems the user is interested in would help this tool be more useful for developers. These filters would also help with the largest limitation of this tool, which is scalability. We used a small subsection of Linux commit data and yet the graph constructed is enormous. In Figure \ref{out}, it is clear to see that the graph is expansive and for a user to search that for a desired subsystem would be unrealistic. 
+Another implementation that would help developers using this tool would be filters to remove redundant or unnecessary information. The ability to sort by what dates the desired commits were made on, by author or by which subsystems the user is interested in would help this tool be more useful for developers. 
+
+These filters would also help with the largest limitation of this tool, which is scalability. We used a small subsection of Linux commit data and yet the graph constructed is enormous. In Figure \ref{out}, it is clear to see that the graph is expansive and for a user to search that for a desired subsystem would be unrealistic. 
+
+A further issue that comes from scalability is node overlap and crowding. For nodes with a large number of children, the arc length's required to space the nodes nicely are too large to be viable. This is because the distance between concentric circles would have to be increased which would make the graph many times larger than it already is.
+
+% talk about node overlap. ok.
 
 
 
